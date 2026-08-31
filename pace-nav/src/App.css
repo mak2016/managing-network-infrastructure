@@ -12,6 +12,45 @@
   inset: 0;
 }
 
+/* --- map loading placeholder ---------------------------------------------- */
+
+.map-loading {
+  position: absolute;
+  inset: 0;
+  z-index: 6; /* above the map canvas and speed overlay, below the HUD */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: #dde3e8;
+  color: #6b7280;
+  font-size: 14px;
+  font-weight: 600;
+  pointer-events: none;
+  transition: opacity 350ms ease-out, visibility 350ms ease-out;
+}
+
+.map-loading--hidden {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.map-loading__spinner {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 3px solid rgba(107, 114, 128, 0.25);
+  border-top-color: #6b7280;
+  animation: map-loading-spin 800ms linear infinite;
+}
+
+@keyframes map-loading-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 /* --- speed color overlay: the core feature ------------------------------ */
 
 .speed-overlay {

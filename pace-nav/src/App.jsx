@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import MapView from "./components/MapView";
+import MapLoadingOverlay from "./components/MapLoadingOverlay";
 import SpeedCluster from "./components/SpeedCluster";
 import TurnBanner from "./components/TurnBanner";
 import SearchBar from "./components/SearchBar";
@@ -32,6 +33,7 @@ export default function App() {
 
   const [hazards, setHazards] = useState([]);
 
+  const [mapLoading, setMapLoading] = useState(true);
   const [mapError, setMapError] = useState(null);
   const lastMapErrorRef = useRef(null);
   const handleMapError = useCallback((detail) => {
@@ -130,8 +132,10 @@ export default function App() {
         onMapClick={handleMapClick}
         onUserDrag={() => setFollowing(false)}
         onMapError={handleMapError}
+        onLoadingChange={setMapLoading}
       />
 
+      <MapLoadingOverlay loading={mapLoading} />
       <SpeedOverlay tint={tint} />
       <DebugPanel />
 
