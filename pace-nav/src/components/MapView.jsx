@@ -22,6 +22,7 @@ export default function MapView({
   onMapClick,
   onUserDrag,
   onMapError,
+  onLoadingChange,
 }) {
   const containerRef = useRef(null);
   const mapRef = useRef(null);
@@ -55,6 +56,13 @@ export default function MapView({
         paint: { "line-color": "#3b82f6", "line-width": 6, "line-opacity": 0.85 },
       });
     });
+
+    // "idle" fires once the style, tiles, and everything queued to render
+    // (roads, buildings, labels) has actually painted — unlike "load", which
+    // fires as soon as the style JSON is parsed but before tile data has
+    // necessarily arrived. Using idle (once) mirrors how Google/Apple Maps
+    // hold a neutral gray placeholder until real map content is on screen.
+    map.once("idle", () => onLoadingChange?.(false));
 
     map.on("click", (e) => onMapClick?.([e.lngLat.lng, e.lngLat.lat]));
     map.on("dragstart", () => onUserDrag?.());
