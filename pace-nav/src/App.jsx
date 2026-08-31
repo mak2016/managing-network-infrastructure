@@ -5,6 +5,7 @@ import TurnBanner from "./components/TurnBanner";
 import SearchBar from "./components/SearchBar";
 import HazardToolbar from "./components/HazardToolbar";
 import SpeedOverlay from "./components/SpeedOverlay";
+import DebugPanel from "./components/DebugPanel";
 import { useGeolocation } from "./hooks/useGeolocation";
 import { fetchRoute } from "./lib/osrm";
 import { fetchNearestSpeedLimit } from "./lib/overpass";
@@ -132,6 +133,7 @@ export default function App() {
       />
 
       <SpeedOverlay tint={tint} />
+      <DebugPanel />
 
       <div className="hud hud--top">
         <SearchBar
