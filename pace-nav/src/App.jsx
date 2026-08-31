@@ -31,6 +31,17 @@ export default function App() {
 
   const [hazards, setHazards] = useState([]);
 
+  const [mapError, setMapError] = useState(null);
+  const lastMapErrorRef = useRef(null);
+  const handleMapError = useCallback((detail) => {
+    // Tile fetch failures can fire repeatedly for the same underlying cause;
+    // only surface the first occurrence of a given message so the banner
+    // doesn't thrash.
+    if (lastMapErrorRef.current === detail) return;
+    lastMapErrorRef.current = detail;
+    setMapError(detail);
+  }, []);
+
   // --- Destination selection -> OSRM route request -------------------------
   const requestRoute = useCallback(async (from, to) => {
     setRouting(true);
@@ -117,6 +128,7 @@ export default function App() {
         following={following}
         onMapClick={handleMapClick}
         onUserDrag={() => setFollowing(false)}
+        onMapError={handleMapError}
       />
 
       <SpeedOverlay tint={tint} />
@@ -142,11 +154,12 @@ export default function App() {
         </button>
       )}
 
-      {(geoError || routeError || routing) && (
+      {(geoError || routeError || routing || mapError) && (
         <div className="status-banner">
           {routing && "Finding route…"}
           {geoError && `GPS error: ${geoError}`}
           {routeError && `Routing error: ${routeError}`}
+          {mapError && `Map error: ${mapError}`}
         </div>
       )}
     </div>

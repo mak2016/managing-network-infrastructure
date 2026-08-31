@@ -21,6 +21,7 @@ export default function MapView({
   following,
   onMapClick,
   onUserDrag,
+  onMapError,
 }) {
   const containerRef = useRef(null);
   const mapRef = useRef(null);
@@ -57,6 +58,12 @@ export default function MapView({
 
     map.on("click", (e) => onMapClick?.([e.lngLat.lng, e.lngLat.lat]));
     map.on("dragstart", () => onUserDrag?.());
+    map.on("error", (e) => {
+      const err = e?.error;
+      const detail = [err?.status, err?.url, err?.message].filter(Boolean).join(" — ");
+      console.error("MapLibre error:", err ?? e);
+      onMapError?.(detail || "Unknown map error (see console)");
+    });
 
     const userEl = document.createElement("div");
     userEl.className = "user-puck";
