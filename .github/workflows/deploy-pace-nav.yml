@@ -34,8 +34,6 @@ jobs:
           cache-dependency-path: pace-nav/package-lock.json
       - run: npm ci
       - run: npm run build
-        env:
-          GITHUB_PAGES: "true"
       - uses: actions/configure-pages@v5
         with:
           enablement: true
