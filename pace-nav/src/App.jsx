@@ -6,7 +6,6 @@ import SearchBar from "./components/SearchBar";
 import HazardToolbar from "./components/HazardToolbar";
 import SpeedOverlay from "./components/SpeedOverlay";
 import { useGeolocation } from "./hooks/useGeolocation";
-import { useViewportHeightVar } from "./hooks/useViewportHeightVar";
 import { fetchRoute } from "./lib/osrm";
 import { fetchNearestSpeedLimit } from "./lib/overpass";
 import { getSpeedTint } from "./lib/speedColor";
@@ -18,7 +17,6 @@ const SPEED_LIMIT_REQUERY_M = 120; // re-poll Overpass after moving this far
 const SPEED_LIMIT_REQUERY_MS = 15000; // ...or after this much time, whichever first
 
 export default function App() {
-  useViewportHeightVar();
   const { position, speedMph, headingDeg, error: geoError } = useGeolocation();
 
   const [following, setFollowing] = useState(true);

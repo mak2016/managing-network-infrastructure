@@ -2,8 +2,7 @@
   position: relative;
   width: 100vw;
   height: 100vh; /* fallback for browsers without dvh support */
-  height: 100dvh; /* better fallback; still unreliable on iOS Safari while its chrome is expanded */
-  height: var(--app-vh, 100dvh); /* set from visualViewport.height in useViewportHeightVar — the one source that always matches what's actually on screen */
+  height: 100dvh; /* tracks the visible viewport as mobile Safari's chrome collapses/expands */
   overflow: hidden;
   font-family: system-ui, "Segoe UI", Roboto, sans-serif;
 }
@@ -64,6 +63,9 @@
   flex-direction: row;
   align-items: flex-end;
   justify-content: space-between;
+  /* clears mobile Safari's overlaid bottom bar / home indicator, which sits
+     on top of page content rather than shrinking the viewport for it */
+  padding-bottom: calc(12px + env(safe-area-inset-bottom));
 }
 
 /* --- search bar ------------------------------------------------------------ */
@@ -260,7 +262,7 @@
 .recenter-btn {
   position: absolute;
   right: 12px;
-  bottom: 96px;
+  bottom: calc(96px + env(safe-area-inset-bottom));
   z-index: 10;
   border: none;
   border-radius: 10px;
