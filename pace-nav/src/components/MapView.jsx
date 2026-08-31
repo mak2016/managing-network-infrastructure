@@ -57,12 +57,22 @@ export default function MapView({
       });
     });
 
-    // "idle" fires once the style, tiles, and everything queued to render
-    // (roads, buildings, labels) has actually painted — unlike "load", which
-    // fires as soon as the style JSON is parsed but before tile data has
-    // necessarily arrived. Using idle (once) mirrors how Google/Apple Maps
-    // hold a neutral gray placeholder until real map content is on screen.
-    map.once("idle", () => onLoadingChange?.(false));
+    // Release the gray loading placeholder once the initial view is ready
+    // to paint. Deliberately NOT gated on "idle" — idle waits for every tile
+    // the tilted 3D view can see, including the extra ones near the horizon,
+    // and on a slow/flaky connection that can take a long time or hang,
+    // leaving the overlay stuck over a map that's actually already
+    // progressively filling in underneath. "load" covers the first visually
+    // complete render of the initial view, which is what the placeholder is
+    // meant to bridge; a timeout is a backstop in case neither ever fires.
+    let revealed = false;
+    const reveal = () => {
+      if (revealed) return;
+      revealed = true;
+      onLoadingChange?.(false);
+    };
+    map.once("load", reveal);
+    const revealTimeout = setTimeout(reveal, 6000);
 
     map.on("click", (e) => onMapClick?.([e.lngLat.lng, e.lngLat.lat]));
     map.on("dragstart", () => onUserDrag?.());
@@ -87,6 +97,7 @@ export default function MapView({
     window.addEventListener("orientationchange", handleViewportResize);
 
     return () => {
+      clearTimeout(revealTimeout);
       window.visualViewport?.removeEventListener("resize", handleViewportResize);
       window.removeEventListener("orientationchange", handleViewportResize);
       map.remove();
