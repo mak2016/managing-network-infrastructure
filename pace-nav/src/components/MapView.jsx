@@ -63,7 +63,17 @@ export default function MapView({
     userEl.innerHTML = '<div class="user-puck__arrow"></div>';
     userMarkerRef.current = new Marker({ element: userEl, rotationAlignment: "map" });
 
+    // Mobile Safari changes the *visible* viewport (address bar collapsing/
+    // expanding) without always firing a container ResizeObserver in sync,
+    // which leaves MapLibre's canvas stale and shows as a black gap. Force a
+    // resize on the signal that actually tracks the real visible area.
+    const handleViewportResize = () => map.resize();
+    window.visualViewport?.addEventListener("resize", handleViewportResize);
+    window.addEventListener("orientationchange", handleViewportResize);
+
     return () => {
+      window.visualViewport?.removeEventListener("resize", handleViewportResize);
+      window.removeEventListener("orientationchange", handleViewportResize);
       map.remove();
       mapRef.current = null;
     };
