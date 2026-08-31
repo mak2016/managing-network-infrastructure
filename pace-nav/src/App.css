@@ -2,7 +2,8 @@
   position: relative;
   width: 100vw;
   height: 100vh; /* fallback for browsers without dvh support */
-  height: 100dvh; /* tracks the real visible viewport as mobile Safari's chrome collapses/expands */
+  height: 100dvh; /* better fallback; still unreliable on iOS Safari while its chrome is expanded */
+  height: var(--app-vh, 100dvh); /* set from visualViewport.height in useViewportHeightVar — the one source that always matches what's actually on screen */
   overflow: hidden;
   font-family: system-ui, "Segoe UI", Roboto, sans-serif;
 }
