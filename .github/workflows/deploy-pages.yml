@@ -1,0 +1,79 @@
+name: Deploy apps to GitHub Pages
+
+# Builds every static app in this repo and publishes them to one GitHub
+# Pages site: pace-nav at the site root, food-app under /food-app/. Replaces
+# the old single-app deploy-pace-nav.yml so the two apps stop fighting over
+# the same "pages" deployment.
+on:
+  push:
+    branches:
+      - claude/pace-nav-app-build-mye5ue
+      - claude/food-delivery-app-y1j5pm
+      - main
+    paths:
+      - "pace-nav/**"
+      - "food-app/**"
+      - ".github/workflows/deploy-pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: |
+            pace-nav/package-lock.json
+            food-app/package-lock.json
+
+      - name: Build pace-nav
+        working-directory: pace-nav
+        run: |
+          npm ci
+          npm run build
+
+      - name: Build food-app
+        working-directory: food-app
+        env:
+          VITE_FIREBASE_CONFIG: ${{ secrets.FOOD_APP_FIREBASE_CONFIG }}
+        run: |
+          npm ci
+          npm run build
+
+      - name: Combine builds
+        run: |
+          mkdir -p site
+          cp -r pace-nav/dist/. site/
+          mkdir -p site/food-app
+          cp -r food-app/dist/. site/food-app/
+
+      - uses: actions/configure-pages@v5
+        with:
+          enablement: true
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

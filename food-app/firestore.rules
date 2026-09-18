@@ -1,0 +1,40 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Any signed-in user is treated as the store owner/admin. This app only
+    // ever issues credentials to the owner (created by hand in the Firebase
+    // console) — there is no public sign-up flow.
+    function isAdmin() {
+      return request.auth != null;
+    }
+
+    match /menuItems/{itemId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /settings/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /orders/{orderId} {
+      // Customers can create an order and, if they have the order ID (from
+      // the confirmation link), read its live status. They can't list all
+      // orders or modify one after it's placed.
+      allow get: if true;
+      allow list: if isAdmin();
+      allow create: if request.resource.data.status == 'placed'
+        && request.resource.data.items is list
+        && request.resource.data.items.size() > 0
+        && request.resource.data.total is number
+        && request.resource.data.total >= 0
+        && request.resource.data.customer.name is string
+        && request.resource.data.customer.name.size() > 0
+        && request.resource.data.customer.phone is string
+        && request.resource.data.customer.phone.size() > 0;
+      allow update, delete: if isAdmin();
+    }
+  }
+}
