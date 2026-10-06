@@ -12,6 +12,13 @@ need to know more:
 - Who is **selling something** related to what they say?
 - What do creators in **other countries or languages** say that English YouTube doesn't?
 
+## Just want the simple version?
+
+Open **`topic_researcher_simple.ipynb`** in Colab. It is about 100 lines, written in the same
+style as the original summarizer notebook, and uses the same `OPENAI_TOKEN` Colab secret.
+Run the cells top to bottom and call `research_topic("your topic")`. The rest of this README
+describes the full CLI version (`yt_topic_research.py`).
+
 ## How it works
 
 ```
